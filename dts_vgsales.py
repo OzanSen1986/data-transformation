@@ -10,9 +10,15 @@ df = df.loc[year_and_genre_filter]
 
 print('----------------------------------->')
 
-print(f"Sales Amount of Europe : ${df['SalesInEurope'].sum():,.2f}")
-print(f"Sales Amount of Japan : ${df['SalesInJapan'].sum():,.2f}")
-print(f"Sales Amount of Global Sales: ${df['Global_Sales'].sum():,.2f}")
-print(f"Sales Amount of NA Sales: ${df['NA_Sales'].sum():,.2f}")
-print(f"Sales Amount of Other Sales: ${df['Other_Sales'].sum():,.2f}")
+sales_regions = ['SalesInEurope', 'SalesInJapan', 'Global_Sales', 'NA_Sales', 'Other_Sales']
+
+for sales_region in sales_regions:
+    print(f"Sum of sales amount of {sales_region} : ${df[sales_region].sum():,.2f}")
+    print(f"Count of sales of {sales_region} : ${df[sales_region].count():,.2f}")
+    print(f"Average sales amount of {sales_region} : ${df[sales_region].mean():,.2f}")
+    print(f"Median sales amount of {sales_region} : ${df[sales_region].median():,.2f}")
+    print(f"Standard deviation of sales amount of {sales_region} : ${df[sales_region].std():,.2f}")
+    print('----->')
+    
+
 
