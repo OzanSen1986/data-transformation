@@ -67,7 +67,7 @@ def main() -> None:
     config = ReportConfig(
         input_file="vgsales.csv",
         start_year=2023,
-        end_date=2024,
+        end_year= 2024,
         metrics=[
             games_count_metric,
             total_sales_metric,
@@ -80,3 +80,6 @@ def main() -> None:
     df = filter_games(df, config.start_year, config.end_year)
     report_data = generate_report_data(df, config)
     write_report(report_data, "games_sales_report.json")
+
+if __name__ == "__main__":
+    main()
