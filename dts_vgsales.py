@@ -13,13 +13,11 @@ class ReportConfig:
     end_year: int
     metrics: list[MetricFn] = field(default_factory=list)
 
-# df = pd.read_csv('vgsales.csv', index_col='Rank')
-# df.rename(columns={'EU_Sales':'SalesInEurope', 'JP_Sales': 'SalesInJapan'}, inplace = True)
 def read_file(file: str) -> pd.DataFrame:
     return pd.read_csv(file)
 
 def convert_data_type(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.astype({'Year': 'Int32'})
+    df = df.astype({'Year': 'Int32', 'NA_Sales': 'Float32', 'EU_Sales': 'Float32', 'JP_Sales': 'Float32', 'Other_Sales': 'Float32', 'Global_Sales': 'Float32'})
     return df
 
 def filter_games(df: pd.DataFrame, start_year: int | None = None, end_year: str | None = None) -> pd.DataFrame:
@@ -40,15 +38,19 @@ def average_sales_metric(df: pd.DataFrame) -> dict[str, Any]:
     avg = sales.mean() if not sales.empty else 0.0
     return {"Average sales value of games": round(avg, 2)}
 
-def pct_by_genre_metric(df: pd.DataFrame, game_type: str) -> dict[str, Any]:
-    total = df[df["Genre"] == game_type]
-    pct = (len(total) / len(df)) * 100 if len(df) > 0.0 else 0.0
-    return {"pct per genre": round(pct, 2)}
+def pct_by_genre_metric(df: pd.DataFrame, game_type: str = "Shooter") -> dict[str, Any]:
+     # Fixed: convert Series to regular Python dict
+    if df.empty:
+        return {"pct_per_genre": {}}
+    genre_counts = df["Genre"].value_counts(normalize=True) * 100
+    # Convert to regular Python dict with float values
+    genre_dict = {str(genre): round(float(percentage), 2) for genre, percentage in genre_counts.items()}
+    return {"pct_per_genre": genre_dict}
     
 def generate_report_data(df: pd.DataFrame, config: ReportConfig) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for metric in config.metrics:
-        result.update(df(metric))
+        result.update(metric(df))
     
     result["report_start_year"] = (
         config.start_year if config.start_year else "N/A"
@@ -77,6 +79,7 @@ def main() -> None:
     )
 
     df = read_file(config.input_file)
+    df = convert_data_type(df)
     df = filter_games(df, config.start_year, config.end_year)
     report_data = generate_report_data(df, config)
     write_report(report_data, "games_sales_report.json")
