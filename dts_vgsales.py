@@ -41,7 +41,7 @@ def average_sales_metric(df: pd.DataFrame) -> dict[str, Any]:
 def pct_by_genre_metric(df: pd.DataFrame, game_type: str = "Shooter") -> dict[str, Any]:
     if df.empty:
         return {"pct_per_genre": {}}
-    genre_counts = df["Genre"].value_counts(normalize=True) * 100
+    genre_counts = df[df["Genre"] == game_type].value_counts(normalize=True) * 100
     genre_dict = {str(genre): round(percentage, 2) for genre, percentage in genre_counts.items()}
     return {"pct_per_genre": genre_dict}
     
