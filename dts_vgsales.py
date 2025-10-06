@@ -20,7 +20,7 @@ def convert_data_type(df: pd.DataFrame) -> pd.DataFrame:
     df = df.astype({'Year': 'Int32'})
     return df
 
-def filter_games(df: pd.DataFrame, start_year: int | None = None, end_year: str | None = None) -> pd.DataFrame:
+def filter_games(df: pd.DataFrame, start_year: int | None = None, end_year: int | None = None) -> pd.DataFrame:
     if start_year:
         df = df[df["Year"] >= start_year]
     if end_year:
