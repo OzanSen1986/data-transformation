@@ -1,1 +1,1 @@
-# Projects with etl and data analytics using core capabilities of python pandas module.
+# Projects with etl and data analytics using core capabilities of python libraries (pandas, numpy etc).
