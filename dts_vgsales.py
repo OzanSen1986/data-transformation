@@ -21,29 +21,25 @@ def convert_data_type(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def filter_games(df: pd.DataFrame, start_year: int | None = None, end_year: int | None = None) -> pd.DataFrame:
-    if start_year:
-        df = df[df["Year"] >= start_year]
-    if end_year:
-        df = df[df["Year"] <= end_year]
+    df = df[(df['Year'] >= start_year) & (df['Year'] <= end_year)]
     return df
 
 def games_count_metric(df: pd.DataFrame) -> dict[str, Any]:
     return {"Number of games": df["Name"].nunique()}
 
 def total_sales_metric(df: pd.DataFrame) -> dict[str, Any]:
-    return {"Total Sales by region": df[["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales", "Global_Sales"]].sum().sum()}
+    return {"Total Sales": round(df[["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales", "Global_Sales"]].sum().sum(),2)}
 
 def average_sales_metric(df: pd.DataFrame) -> dict[str, Any]:
-    sales = df[["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales", "Global_Sales"]].sum().sum()
+    sales = df[["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales", "Global_Sales"]].sum()
     avg = sales.mean()
     return {"Average sales value of games": round(avg, 2)}
 
 def pct_by_genre_metric(df: pd.DataFrame, game_type: str = "Shooter") -> dict[str, Any]:
     if df.empty:
         return {"pct_per_genre": {}}
-    genre_counts = df[df["Genre"] == game_type].value_counts(normalize=True) * 100
-    genre_dict = {str(genre): round(percentage, 2) for genre, percentage in genre_counts.items()}
-    return {"pct_per_genre": genre_dict}
+    genre_counts = len(df[df["Genre"] == game_type])
+    return {"pct_per_genre": round((genre_counts/len(df))*100,2)}
     
 def generate_report_data(df: pd.DataFrame, config: ReportConfig) -> dict[str, Any]:
     result: dict[str, Any] = {}
@@ -66,8 +62,8 @@ def write_report(data: dict[str, Any], filename: str):
 def main() -> None:
     config = ReportConfig(
         input_file="vgsales.csv",
-        start_year=2023,
-        end_year= 2024,
+        start_year=2012,
+        end_year= 2012,
         metrics=[
             games_count_metric,
             total_sales_metric,
