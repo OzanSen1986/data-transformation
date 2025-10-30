@@ -1,17 +1,18 @@
 import json
 import pandas as pd
-from typing import Any, Callable, TypeAlias
+from collections.abc import Callable
+from typing import Any, Literal
 from datetime import datetime
 from dataclasses import dataclass, field
 
-MetricFn: TypeAlias = Callable[[pd.DataFrame], dict[str, Any]]
+MetricFn:Callable[[pd.DataFrame], dict[str, Any]]
 
 @dataclass
 class ReportConfig:
     input_file: str
     start_year: int
     end_year: int
-    metrics: list[MetricFn] = field(default_factory=list)
+    metrics: list["MetricFn"] = field(default_factory=list)
 
 def read_file(file: str) -> pd.DataFrame:
     return pd.read_csv(file)
