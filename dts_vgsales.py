@@ -1,20 +1,21 @@
 import json
 import pandas as pd
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any, Literal
 from datetime import datetime
 from dataclasses import dataclass, field
 
-MetricFn:Callable[[pd.DataFrame], dict[str, Any]]
+MetricFn = Callable[[pd.DataFrame], dict[str, Any]]
 
 @dataclass
 class ReportConfig:
-    input_file: str
+    input_file: Path
     start_year: int
     end_year: int
-    metrics: list["MetricFn"] = field(default_factory=list)
+    metrics: list[MetricFn] = field(default_factory=list)
 
-def read_file(file: str) -> pd.DataFrame:
+def read_file(file: Path) -> pd.DataFrame:
     return pd.read_csv(file)
 
 def convert_data_type(df: pd.DataFrame) -> pd.DataFrame:
@@ -55,16 +56,16 @@ def generate_report_data(df: pd.DataFrame, config: ReportConfig) -> dict[str, An
     )
     return result
 
-def write_report(data: dict[str, Any], filename: str):
-    with open(filename, "w") as f:
+def write_report(data: dict[str, Any], path: Path):
+    with path.open("w") as f:
         json.dump(data, f, indent=2)
     
 
 def main() -> None:
     config = ReportConfig(
-        input_file="vgsales.csv",
+        input_file=Path("vgsales.csv"),
         start_year=2012,
-        end_year= 2012,
+        end_year=2013,
         metrics=[
             games_count_metric,
             total_sales_metric,
@@ -77,7 +78,7 @@ def main() -> None:
     df = convert_data_type(df)
     df = filter_games(df, config.start_year, config.end_year)
     report_data = generate_report_data(df, config)
-    write_report(report_data, "games_sales_report.json")
+    write_report(report_data, Path("games_sales_report.json"))
 
 if __name__ == "__main__":
     main()
